@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 import { FormCreateContact } from 'components/Forms/FormCreateContact';
 import { ContactList } from 'components/ContactList/ContactList';
 import { Filter } from 'components/Filter/Filter';
+import css from './App.module.css';
 
 const INITIAL_STATE = [
   { id: nanoid(), name: 'Rosie Simpson', number: '459-12-56' },
@@ -29,24 +30,40 @@ export class App extends Component {
     }));
   };
 
-  filterContact = ({ target: { value } }) => {
-    this.setState({ filter: value });
+  handleDelete = id => {
     this.setState(prev => ({
-      contacts: prev.contacts.filter(el =>
-        el.name.toLowerCase().includes(this.state.filter.toLocaleLowerCase())
-      ),
+      contacts: prev.contacts.filter(el => el.id !== id),
     }));
   };
 
+  filterContact = ({ target: { value } }) => {
+    this.setState({ filter: value });
+  };
+
   render() {
+    let filteredContacts = null;
+    filteredContacts = this.state.contacts.filter(el =>
+      el.name.toLowerCase().includes(this.state.filter.toLocaleLowerCase())
+    );
     return (
-      <div>
+      <div className={css.container}>
         <h1>Phone book</h1>
         <FormCreateContact createContact={this.createContact} />
 
         <h2>Contacts</h2>
         <Filter filterContact={this.filterContact} />
-        <ContactList array={this.state.contacts} />
+
+        {filteredContacts ? (
+          <ContactList
+            array={filteredContacts}
+            handleDelete={this.handleDelete}
+          />
+        ) : (
+          <ContactList
+            array={this.state.contacts}
+            handleDelete={this.handleDelete}
+          />
+        )}
       </div>
     );
   }
